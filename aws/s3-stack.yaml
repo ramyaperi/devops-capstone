@@ -1,0 +1,49 @@
+Description:
+  S§ buckets
+Parameters:
+  EnvironmentName:
+    Description: An environment name
+    Type: String
+
+  NameBucket1:
+    Description: s3 bucket name
+    Type: String
+
+  NameBucket2:
+    Description: s3 bucket name
+    Type: String
+Resources:
+
+  KeypairBucketS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref NameBucket1
+    DeletionPolicy: Delete
+
+  DataBucketS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref NameBucket2
+    DeletionPolicy: Delete
+Outputs:
+  keysBucket:
+    Value: !Ref KeypairBucketS3
+    Description: bucket that stores keypairs
+    Export:
+      Name: !Sub ${EnvironmentName}-keysBucket
+
+  DataBucket:
+    Value: !Ref DataBucketS3
+    Description: bucket that stores code
+    Export:
+      Name: !Sub ${EnvironmentName}-DataBucket
+
+  keysBucketARN:
+    Value: !Join ["", ["arn:aws:s3:::", !Ref "KeypairBucketS3", "/*"]]
+    Export:
+      Name: !Sub ${EnvironmentName}-keysBucketARN
+
+  DataBucketARN:
+    Value: !Join ["", ["arn:aws:s3:::", !Ref "DataBucketS3", "/*"]]
+    Export:
+      Name: !Sub ${EnvironmentName}-DataBucketARN

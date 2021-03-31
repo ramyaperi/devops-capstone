@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "UdacityCapstoneProject"
+  },
+  {
+    "ParameterKey": "NameBucket1",
+    "ParameterValue": "uda-keypairs"
+  },
+  {
+    "ParameterKey": "NameBucket2",
+    "ParameterValue": "uda-devopscode"
+  }
+]

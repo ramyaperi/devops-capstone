@@ -1,0 +1,150 @@
+Description:
+   udacity capstone  Project
+  want to create a server  with kubernetes cluster
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name
+    Type: String
+
+Resources:
+  UdaCapRolIAM:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironmentName}-UdaCap-Role"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+
+  UdaCapPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub "${EnvironmentName}-UdaCap-Policies"
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ec2:DescribeAddresses"
+              - "ec2:AllocateAddress"
+              - "ec2:DescribeInstances"
+              - "ec2:AssociateAddress"
+              - "ssm:Get*"
+              - "s3:Get*"
+            Resource: '*'
+      Roles:
+        - !Ref UdaCapRolIAM
+
+  UdaCapInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref UdaCapRolIAM
+
+  LoadBalancerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to our load balancer
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: name
+          Value: !Sub ${EnvironmentName} SecGroup of Load Balancer
+  BastionServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh to our server
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to our hosts
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-VPCID"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+
+  BastionHostInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0767046d1677be5a0
+      InstanceType: t2.micro
+      KeyName: udacapstone
+      SecurityGroupIds:
+        - !Ref BastionServerSecGroup
+      SubnetId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-PUB1-SN"
+      UserData:
+        Fn::Base64: !Sub |
+                    apt-get update -y
+                    sudo snap install aws-cli --classic
+                    cd /home/ubuntu
+                    aws s3 cp s3://uda-keypairs/udacapstone.pem .
+                    chmod 400 udacapstone.pem
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0767046d1677be5a0
+      InstanceType: t3.small
+      KeyName: udacapstone
+      SecurityGroupIds:
+        - !Ref WebServerSecGroup
+      SubnetId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-PRI1-SN"
+      UserData:
+        Fn::Base64: !Sub |
+                 sudo snap install docker
+                 sudo snap install kubectl --classic
+
+Outputs:
+  WebsiteURL:
+    Description: URL for newly created stack
+    Value: !Join
+      - ''
+      - - 'http://'
+        - !GetAtt
+          - EC2Instance
+          - PublicDnsName
