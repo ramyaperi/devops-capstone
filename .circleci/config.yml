@@ -140,12 +140,17 @@ jobs:
 workflows:
   default:
     jobs:
+      - setup-environment:
+          context: slack
       - test-frontend:
           context: slack
+          requires: [setup-environment]
       - scan-frontend:
           context: slack
+          requires: [setup-environment]
       - build-frontend:
           context: slack
           requires:
+            - setup-environment
             - test-frontend
             - scan-frontend
