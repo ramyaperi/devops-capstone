@@ -52,13 +52,22 @@ jobs:
           command: |
             sudo npm i npm@6.9.0 -g
             npm install
-            - run:
-                name: Build Node Sass
-                command: npm install --unsafe-perm node-sass
-            - save_cache:
-                key: v1-dependencies-{{ checksum "frontend/package.json" }}
-                paths:
-                  - node_modules
+      - run:
+          name: Build Node Sass
+          command: npm install --unsafe-perm node-sass
+      - save_cache:
+          key: v1-dependencies-{{ checksum "frontend/package.json" }}
+          paths:
+            - node_modules
+      - persist_to_workspace:
+          root: .
+          paths:
+            - src
+            - package.json
+            - angular.json
+            - Dockerfile
+            - tslint.json
+            - tsconfig.json
   build-frontend:
     executor: my-executor
     steps:
@@ -73,11 +82,11 @@ jobs:
       - save_cache:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-            - dist
+            - frontend/dist
       - persist_to_workspace:
           root: .
           paths:
-            - dist
+            - frontend/dist
       - slack-notification-fail
   test-frontend:
     executor: my-executor
