@@ -60,39 +60,36 @@ jobs:
           paths: [ frontend ]
           key: frontend-build
   build-frontend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor: common/node
     steps:
       - checkout
+      - node/install-packages
       - restore_cache:
           keys: [ frontend ]
       - run:
           name: Build front-end
           command: |
             cd frontend
-            sudo su
             npm run build
       - save_cache:
           paths: [ frontend ]
           key: frontend-build
       - slack-notification-fail
   test-frontend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor: common/node-browsers
     steps:
       - checkout
+      - common/chrome-upgrade
       - restore_cache:
           keys: [ frontend ]
       - run:
           name: Run frontend tests
           command: |
             cd frontend
-            npm i
             npm run test
       - slack-notification-fail
   scan-frontend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor: common/node
     steps:
       - checkout
       - restore_cache:
