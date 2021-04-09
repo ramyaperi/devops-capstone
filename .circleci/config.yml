@@ -136,7 +136,7 @@ workflows:
       - test-frontend:
           context: slack
       - scan-frontend:
-        context: slack
+          context: slack
       - build-frontend:
           context: slack
           requires:
