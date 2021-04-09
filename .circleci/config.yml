@@ -75,10 +75,10 @@ jobs:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - dist
-            - persist_to_workspace:
-                root: .
-                paths:
-                  - dist
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
       - slack-notification-fail
   test-frontend:
     executor: my-executor
