@@ -39,65 +39,37 @@ commands:
                 }
               ]
             }
-executors:
-  my-executor:
-    docker:
-      - image: circleci/node:8.9.4-browsers
 jobs:
-  setup-environment:
-    executor: my-executor
-    steps:
-      - run:
-          name: Install local dependencies
-          command: |
-            sudo npm i npm@6.9.0 -g
-            npm i -g @angular/cli
-            npm install
-      - run:
-          name: Build Node Sass
-          command: npm install --unsafe-perm node-sass
-      - save_cache:
-          key: v1-dependencies-{{ checksum "frontend/package.json" }}
-          paths:
-            - node_modules
-      - persist_to_workspace:
-          root: .
-          paths:
-            - src
-            - package.json
-            - angular.json
-            - Dockerfile
-            - tslint.json
-            - tsconfig.json
   build-frontend:
-    executor: my-executor
+    docker:
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys:
-            - frontend
+          keys: [ frontend-build ]
+      - run:
+          name: Install prerequsites
+          command: |
+            sudo apt -y install git curl
       - run:
           name: Build front-end
           command: |
             cd frontend
             sudo su
+            npm i
+            npm install -g @angular/cli
             npm run build
       - save_cache:
-          key: v1-dist
-          paths:
-            - frontend/dist
-      - persist_to_workspace:
-          root: .
-          paths:
-            - frontend/dist
+          paths: [ frontend ]
+          key: frontend-build
       - slack-notification-fail
   test-frontend:
-    executor: my-executor
+    docker:
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys:
-            - frontend
+          key: frontend-build
       - run:
           name: Run frontend tests
           command: |
@@ -119,7 +91,12 @@ jobs:
       - restore_cache:
           key: frontend-build
       - run:
-          name: Scan frontend depedencies
+          name: lint frontend
+          command: |
+            cd frontend
+            npm run lint
+      - run:
+          name: Scan frontend security
           command: |
             cd frontend
             npm audit --audit-level=critical
@@ -156,5 +133,12 @@ jobs:
 workflows:
   default:
     jobs:
+      - test-frontend:
+          context: slack
+      - scan-frontend:
+        context: slack
       - build-frontend:
           context: slack
+          requires:
+            - test-frontend
+            - scan-frontend
