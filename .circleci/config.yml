@@ -140,20 +140,17 @@ jobs:
 workflows:
   default:
     jobs:
-      - setup-environment:
-          context:
-            - slack
-            - angular
+
       - test-frontend:
           context:
             - slack
             - angular
-          requires: [setup-environment]
+
       - scan-frontend:
           context:
             - slack
             - angular
-          requires: [setup-environment]
+          
       - build-frontend:
           context:
             - slack
