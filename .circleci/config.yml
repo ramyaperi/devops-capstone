@@ -39,42 +39,55 @@ commands:
                 }
               ]
             }
-jobs:
-  build-frontend:
+executors:
+  my-executor:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:8.9.4-browsers
+jobs:
+  setup-environment:
+    executor: my-executor
+    steps:
+      - run:
+          name: Install local dependencies
+          command: |
+            sudo npm i npm@6.9.0 -g
+            npm install
+            - run:
+                name: Build Node Sass
+                command: npm install --unsafe-perm node-sass
+            - save_cache:
+                key: v1-dependencies-{{ checksum "package.json" }}
+                paths:
+                  - node_modules
+  build-frontend:
+    executor: my-executor
     steps:
       - checkout
       - restore_cache:
-          keys: [ frontend-build ]
-      - run:
-          name: Install prerequsites
-          command: |
-            sudo apt -y install jq tar gzip git curl
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
       - run:
           name: Build front-end
           command: |
-            cd frontend
-            sudo su
-            npm i
-            npm install -g @angular/cli
             npm run build
       - save_cache:
-          paths: [ frontend/node_modules ]
-          key: frontend-build
+          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - dist
+            - persist_to_workspace:
+                root: .
+                paths:
+                  - dist
       - slack-notification-fail
   test-frontend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor: my-executor
     steps:
       - checkout
-
-      - run:
-          name: Install prerequsites
-          command: |
-            sudo apt -y install jq tar gzip git curl
       - restore_cache:
-          key: frontend-build
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
       - run:
           name: Run frontend tests
           command: |
