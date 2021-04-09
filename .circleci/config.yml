@@ -64,6 +64,7 @@ jobs:
     working_directory: ~/devops-capstone/frontend
     steps:
       - checkout
+      - node/install-packages
       - restore_cache:
           keys: [ frontend ]
       - run:
