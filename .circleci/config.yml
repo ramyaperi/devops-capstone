@@ -150,12 +150,11 @@ workflows:
           context:
             - slack
             - angular
-          
+
       - build-frontend:
           context:
             - slack
             - angular
           requires:
-            - setup-environment
             - test-frontend
             - scan-frontend
