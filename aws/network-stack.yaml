@@ -47,16 +47,6 @@ Resources:
           Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
 
 
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
-      CidrBlock: !Select [ 1, !Ref SubnetCIDRBlocks ]
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
 
   NatGateway1EIP:
     Type: AWS::EC2::EIP
@@ -93,29 +83,6 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1
 
-
-  PrivateRouteTable1:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} Private Routes (AZ1)
-
-  DefaultPrivateRoute1:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable1
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGateway1
-
-  PrivateSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable1
-      SubnetId: !Ref PrivateSubnet1
-
-
 Outputs:
   VPC:
     Description: A reference to the created VPC
@@ -129,12 +96,6 @@ Outputs:
     Export:
       Name: !Sub ${EnvironmentName}-PUB-RT
 
-  VPCPrivateRouteTable1:
-    Description: Private Routing AZ1
-    Value: !Ref PrivateRouteTable1
-    Export:
-      Name: !Sub ${EnvironmentName}-PRI1-RT
-
 
   PublicSubnets:
     Description: A list of the public subnets
@@ -142,11 +103,6 @@ Outputs:
     Export:
       Name: !Sub ${EnvironmentName}-PUB-NETS
 
-  PrivateSubnets:
-    Description: A list of the private subnets
-    Value: !Join [ ",", [ !Ref PrivateSubnet1 ]]
-    Export:
-      Name: !Sub ${EnvironmentName}-PRIV-NETS
 
   PublicSubnet1:
     Description: A reference to the public subnet in the 1st Availability Zone
@@ -154,10 +110,4 @@ Outputs:
     Export:
       Name: !Sub ${EnvironmentName}-PUB1-SN
 
-
-  PrivateSubnet1:
-    Description: A reference to the private subnet in the 1st Availability Zone
-    Value: !Ref PrivateSubnet1
-    Export:
-      Name: !Sub ${EnvironmentName}-PRI1-SN
 
