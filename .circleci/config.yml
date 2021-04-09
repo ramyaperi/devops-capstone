@@ -75,14 +75,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "frontend/package.json" }}
+            - frontend
       - run:
           name: Build front-end
           command: |
             cd frontend
             npm run build
       - save_cache:
-          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+          key: v1-dist
           paths:
             - frontend/dist
       - persist_to_workspace:
@@ -96,7 +96,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "frontend/package.json" }}
+            - frontend
       - run:
           name: Run frontend tests
           command: |
