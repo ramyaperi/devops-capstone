@@ -56,7 +56,7 @@ jobs:
                 name: Build Node Sass
                 command: npm install --unsafe-perm node-sass
             - save_cache:
-                key: v1-dependencies-{{ checksum "package.json" }}
+                key: v1-dependencies-{{ checksum "frontend/package.json" }}
                 paths:
                   - node_modules
   build-frontend:
@@ -65,7 +65,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "frontend/package.json" }}
             - v1-dependencies-
       - run:
           name: Build front-end
@@ -86,7 +86,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "frontend/package.json" }}
             - v1-dependencies-
       - run:
           name: Run frontend tests
