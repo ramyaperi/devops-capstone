@@ -51,6 +51,7 @@ jobs:
           name: Install local dependencies
           command: |
             sudo npm i npm@6.9.0 -g
+            npm i -g @angular/cli
             npm install
       - run:
           name: Build Node Sass
