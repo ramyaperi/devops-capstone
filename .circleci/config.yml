@@ -40,24 +40,37 @@ commands:
               ]
             }
 jobs:
+  setup-environment:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Install prerequsites
+          command: |
+            sudo apt -y install git curl
+      - run:
+          name: set up front-end
+          command: |
+            cd frontend
+            sudo su
+            npm i
+            npm install -g @angular/cli
+      - save_cache:
+          paths: [ frontend ]
+          key: frontend-build
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [ frontend-build ]
-      - run:
-          name: Install prerequsites
-          command: |
-            sudo apt -y install git curl
+          keys: [ frontend ]
       - run:
           name: Build front-end
           command: |
             cd frontend
             sudo su
-            npm i
-            npm install -g @angular/cli
             npm run build
       - save_cache:
           paths: [ frontend ]
@@ -69,7 +82,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: frontend-build
+          keys: [ frontend ]
       - run:
           name: Run frontend tests
           command: |
@@ -82,14 +95,8 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-
-      - run:
-          name: Install prerequsites
-          command: |
-            sudo apt -y install jq tar gzip git curl
-
       - restore_cache:
-          key: frontend-build
+          keys: [ frontend ]
       - run:
           name: lint frontend
           command: |
