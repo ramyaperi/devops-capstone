@@ -55,6 +55,7 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
+            sudo su
             npm i
             npm install -g @angular/cli
             npm run build
