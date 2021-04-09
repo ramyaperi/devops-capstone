@@ -79,6 +79,7 @@ jobs:
       - run:
           name: Build front-end
           command: |
+            npm i -g @angular/cli
             cd frontend
             npm run build
       - save_cache:
