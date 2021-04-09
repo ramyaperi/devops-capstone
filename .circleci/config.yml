@@ -2,7 +2,8 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.3.0
   aws-cli: circleci/aws-cli@1.3.0
-  common: okode/angular@1.0.137
+  common: okode/common@volatile
+  node: circleci/node@4
 commands:
   slack-notification-fail:
     description: Send notification to Slack
@@ -137,7 +138,6 @@ jobs:
 workflows:
   default:
     jobs:
-
       - test-frontend:
           context: slack
       - scan-frontend:
