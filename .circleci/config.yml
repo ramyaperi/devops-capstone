@@ -53,6 +53,7 @@ jobs:
       - run:
           name: set up front-end
           command: |
+            sudo su
             npm install npm@latest -g
             npm install angular-cli@latest
       - save_cache:
@@ -69,8 +70,6 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            cd frontend
-            sudo su
             npm run build
       - save_cache:
           paths: [ frontend ]
@@ -87,8 +86,6 @@ jobs:
       - run:
           name: Run frontend tests
           command: |
-            cd frontend
-            npm i
             npm run test
       - slack-notification-fail
   scan-frontend:
