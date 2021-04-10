@@ -43,6 +43,7 @@ jobs:
   setup-environment:
     docker:
       - image: circleci/node:10-browsers
+    working_directory: ~/devops-capstone/frontend
     steps:
       - checkout
       - run:
@@ -52,7 +53,6 @@ jobs:
       - run:
           name: set up front-end
           command: |
-            cd frontend
             npm install npm@latest -g
             npm install angular-cli@latest
       - save_cache:
@@ -61,6 +61,7 @@ jobs:
   build-frontend:
     docker:
       - image: circleci/node:10-browsers
+    working_directory: ~/devops-capstone/frontend
     steps:
       - checkout
       - restore_cache:
@@ -78,6 +79,7 @@ jobs:
   test-frontend:
     docker:
       - image: circleci/node:10-browsers
+    working_directory: ~/devops-capstone/frontend
     steps:
       - checkout
       - restore_cache:
