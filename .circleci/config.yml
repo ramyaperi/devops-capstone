@@ -64,10 +64,10 @@ jobs:
           name: Install local dependencies
           command: npm install
       - run:
-          name: Run frontend tests
+          name: lint frontend
           command: |
             cd frontend
-            npm run test  --watch=false
+            npm run lint
           # Cache local dependencies if they don't exist
       - save_cache:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
@@ -87,7 +87,7 @@ jobs:
           name: Run frontend tests
           command: |
             cd frontend
-            npm run test
+            npm run test  --watch=false
       - slack-notification-fail
   scan-frontend:
     docker:
