@@ -42,47 +42,43 @@ commands:
 jobs:
   setup-environment:
     docker:
-      - image: circleci/node:10-browsers
-    working_directory: ~/devops-capstone/frontend
+      - image: circleci/node:12.16-browsers
+    working_directory:  ~/devops-capstone/frontend
     steps:
       - checkout
+          path: ~/devops-capstone/frontend
+      - run:
+          name: Show current branch
+          command: echo ${CIRCLE_BRANCH}
       - run:
           name: Install prerequsites
           command: |
             sudo apt -y install git curl
-      - run:
-          name: set up front-end
-          command: |
-            sudo su
-            npm install npm@latest -g
-            npm install angular-cli@latest
-      - save_cache:
-          paths: [ frontend ]
-          key: frontend
-  build-frontend:
-    docker:
-      - image: circleci/node:10-browsers
-    working_directory: ~/devops-capstone/frontend
-    steps:
-      - checkout
       - restore_cache:
-          keys: [ frontend ]
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+         # Install project dependencies
       - run:
-          name: Build front-end
-          command: |
-            npm run build
+          name: Install local dependencies
+          command: npm install
+          # Cache local dependencies if they don't exist
       - save_cache:
-          paths: [ frontend ]
-          key: frontend-build
-      - slack-notification-fail
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
   test-frontend:
     docker:
-      - image: circleci/node:10-browsers
+      - image: circleci/node:12.16-browsers
     working_directory: ~/devops-capstone/frontend
     steps:
       - checkout
+        path: ~/devops-capstone/frontend
       - restore_cache:
-          keys: [ frontend ]
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
       - run:
           name: Run frontend tests
           command: |
@@ -90,11 +86,15 @@ jobs:
       - slack-notification-fail
   scan-frontend:
     docker:
-      - image: circleci/node:10-browsers
+      - image: circleci/node:12.16-browsers
+    working_directory: ~/devops-capstone/frontend
     steps:
       - checkout
+        path: ~/devops-capstone/frontend
       - restore_cache:
-          keys: [ frontend ]
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
       - run:
           name: lint frontend
           command: |
@@ -105,6 +105,26 @@ jobs:
           command: |
             cd frontend
             npm audit --audit-level=critical
+      - slack-notification-fail
+  build-frontend:
+    docker:
+      - image: circleci/node:12.16-browsers
+    working_directory: ~/devops-capstone/frontend
+    steps:
+      - checkout
+        path: ~/devops-capstone/frontend
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run:
+          name: Build front-end
+          command: |
+            npm run build
+      - save_cache:
+          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - dist
       - slack-notification-fail
   deploy-frontend:
     docker:
