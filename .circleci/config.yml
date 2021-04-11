@@ -130,6 +130,10 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - run:
+            name: Install dependencies
+            command: |
+              sudo apt -y install curl
       - restore_cache:
           keys:
              - v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
@@ -139,7 +143,7 @@ jobs:
           name: build a docker container
           command: |
             cd frontend
-            docker build . --tag=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}"
+            docker build . --tag=ramyaperi/dev:devops-${CIRCLE_WORKFLOW_ID:0:7}
       - run:
           name: push a docker container
           command: |
