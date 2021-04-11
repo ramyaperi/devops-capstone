@@ -103,13 +103,17 @@ jobs:
   build-frontend:
     docker:
       - image: circleci/node:12.16-browsers
-    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "./frontend/package.json" }}
             - v1-dependencies-
+      - run:
+          name: Install local dependencies
+          command: |
+            cd frontend
+            npm install
       - run:
           name: Build front-end
           command: |
@@ -129,24 +133,14 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Install dependencies
-          command: |
-            cd frontend
-            sudo apt -y install jq tar gzip git curl
-            npm install -g @angular/cli
-            npm install
-      - run:
-          name: Build frontend
-          command: |
-            cd frontend
-            npm run build
-      - run:
           name: build a docker container
           command: |
+            cd frontend
             docker build --tag=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" .
       - run:
           name: push a docker container
           command: |
+            cd frontend
             docker push ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}"
       - slack-notification-fail
 workflows:
@@ -162,3 +156,7 @@ workflows:
           requires:
             - setup-environment
             - test-frontend
+      - deploy-frontend
+          context: slack
+          requires:
+            - build-frontend
