@@ -129,6 +129,10 @@ jobs:
       - image:  docker:17.05.0-ce-git
     steps:
       - checkout
+      - setup_remote_docker
+      - run: |
+            yum -y install curl
+            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
       - run:
           name: build a docker container
           command: |
