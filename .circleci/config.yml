@@ -126,12 +126,9 @@ jobs:
       - slack-notification-fail
   deploy-frontend:
     docker:
-      - image: circleci/node:12.16-browsers
+      - image:  docker:17.05.0-ce-git
     steps:
       - checkout
-      - aws-cli/setup
-      - attach_workspace:
-          at: ~/
       - run:
           name: build a docker container
           command: |
