@@ -65,6 +65,11 @@ jobs:
           command: |
             cd frontend
             npm install
+      - run:
+          name: lint frontend
+          command: |
+            cd frontend
+            npm run lint
           # Cache local dependencies if they don't exist
       - save_cache:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
