@@ -131,7 +131,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - restore_cache:
-          keys: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+          keys:
+             - v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
       - run: |
             docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
       - run:
