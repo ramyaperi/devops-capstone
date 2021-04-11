@@ -67,7 +67,7 @@ jobs:
           name: Run frontend tests
           command: |
             cd frontend
-            npm run test
+            npm run test  --watch=false
           # Cache local dependencies if they don't exist
       - save_cache:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
