@@ -65,16 +65,11 @@ jobs:
           command: |
             cd frontend
             npm install
-      - run:
-          name: lint frontend
-          command: |
-            cd frontend
-            npm run lint
           # Cache local dependencies if they don't exist
       - save_cache:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
           paths:
-            - ./frontend
+            - ./frontend/node_modules
   test-frontend:
     docker:
       - image: circleci/node:12.16-browsers
@@ -84,6 +79,11 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "./frontend/package.json" }}
             - v1-dependencies-
+      - run:
+          name: Install local dependencies
+          command: |
+            cd frontend
+            npm install
       - run:
           name: Run frontend tests
           command: |
