@@ -46,10 +46,11 @@ jobs:
     working_directory:  ~/frontend
     steps:
       - checkout
-          path: ~/frontend
       - run:
           name: Show current branch
-          command: echo ${CIRCLE_BRANCH}
+          command: |
+            echo ${CIRCLE_BRANCH}
+            ls
       - run:
           name: Install prerequsites
           command: |
@@ -74,7 +75,6 @@ jobs:
     working_directory: ~/frontend
     steps:
       - checkout
-        path: ~/frontend
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -90,7 +90,6 @@ jobs:
     working_directory: ~/frontend
     steps:
       - checkout
-        path: ~/frontend
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -112,7 +111,6 @@ jobs:
     working_directory: ~/frontend
     steps:
       - checkout
-        path: ~/frontend
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
