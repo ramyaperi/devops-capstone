@@ -57,7 +57,7 @@ jobs:
             sudo apt -y install git curl
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "~/frontend/package.json" }}
+            - v1-dependencies-{{ checksum "./frontend/package.json" }}
             - v1-dependencies-
          # Install project dependencies
       - run:
@@ -65,7 +65,7 @@ jobs:
           command: npm install
           # Cache local dependencies if they don't exist
       - save_cache:
-          key: v1-dependencies-{{ checksum "~/frontend/package.json" }}
+          key: v1-dependencies-{{ checksum "./frontend/package.json" }}
           paths:
             - node_modules
 
