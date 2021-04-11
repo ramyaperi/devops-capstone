@@ -62,7 +62,9 @@ jobs:
          # Install project dependencies
       - run:
           name: Install local dependencies
-          command: npm install
+          command: |
+            cd frontend
+            npm install
           # Cache local dependencies if they don't exist
       - save_cache:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
@@ -83,16 +85,6 @@ jobs:
           command: |
             cd frontend
             npm run test  --watch=false
-      - slack-notification-fail
-  scan-frontend:
-    docker:
-      - image: circleci/node:12.16-browsers
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "./frontend/package.json" }}
-            - v1-dependencies-
       - run:
           name: lint frontend
           command: |
@@ -161,12 +153,8 @@ workflows:
       - test-frontend:
           context: slack
           requires: [setup-environment]
-      - scan-frontend:
-          context: slack
-          requires: [setup-environment]
       - build-frontend:
           context: slack
           requires:
             - setup-environment
             - test-frontend
-            - scan-frontend
