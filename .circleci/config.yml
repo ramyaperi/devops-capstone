@@ -139,7 +139,7 @@ jobs:
           name: build a docker container
           command: |
             cd frontend
-            docker build --tag=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" .
+            docker build . --tag=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: push a docker container
           command: |
