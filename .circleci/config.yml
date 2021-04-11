@@ -74,8 +74,7 @@ jobs:
       - save_cache:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
           paths:
-            - ./frontend/node_modules
-
+            - ./frontend
   test-frontend:
     docker:
       - image: circleci/node:12.16-browsers
