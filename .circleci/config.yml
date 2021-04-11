@@ -43,7 +43,7 @@ jobs:
   setup-environment:
     docker:
       - image: circleci/node:12.16-browsers
-    working_directory:  ~/frontend
+    working_directory:  ~/devops-capstone/frontend
     steps:
       - checkout
       - run:
