@@ -67,32 +67,31 @@ jobs:
       - save_cache:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
           paths:
-            - node_modules
+            - ./frontend/node_modules
 
   test-frontend:
     docker:
       - image: circleci/node:12.16-browsers
-    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "./frontend/package.json" }}
             - v1-dependencies-
       - run:
           name: Run frontend tests
           command: |
+            cd frontend
             npm run test
       - slack-notification-fail
   scan-frontend:
     docker:
       - image: circleci/node:12.16-browsers
-    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "./frontend/package.json" }}
             - v1-dependencies-
       - run:
           name: lint frontend
@@ -113,20 +112,21 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "./frontend/package.json" }}
             - v1-dependencies-
       - run:
           name: Build front-end
           command: |
+            cd frontend
             npm run build
       - save_cache:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-            - dist
+            - ./frontend/dist
       - slack-notification-fail
   deploy-frontend:
     docker:
-      - image: circleci/node:10-browsers
+      - image: circleci/node:12.16-browsers
     steps:
       - checkout
       - aws-cli/setup
