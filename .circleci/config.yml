@@ -162,9 +162,12 @@ jobs:
           name: install frontend
           command: |
             ssh -o StrictHostKeyChecking=no  ubuntu@ec2-3-127-223-111.eu-central-1.compute.amazonaws.com
+            sudo su
             kubectl get pods -o wide
             kubectl set image deployment/frontend-deployment frontend=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" --record
             kubectl get pods -o wide
+            exit
+            exit
 workflows:
   default:
     jobs:
