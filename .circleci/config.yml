@@ -151,7 +151,7 @@ jobs:
   deploy-frontend:
     docker:
       - image: amazon/aws-cli
-    - steps:
+    steps:
       - run:
           name: install frontend
           command: |
