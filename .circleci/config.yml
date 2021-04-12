@@ -160,8 +160,7 @@ jobs:
       - run:
           name: install frontend
           command: |
-            ssh -o StrictHostKeyChecking=no  ubuntu@ec2-3-127-223-111.eu-central-1.compute.amazonaws.com "sudo su;
-            kubectl set image deployment/frontend frontend=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" --record";
+            ssh -o StrictHostKeyChecking=no  ubuntu@ec2-3-127-223-111.eu-central-1.compute.amazonaws.com "sudo su;./deploy ${CIRCLE_WORKFLOW_ID:0:7} ";
 workflows:
   default:
     jobs:
