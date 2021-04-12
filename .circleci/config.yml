@@ -135,6 +135,7 @@ jobs:
              - v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
       - run: |
             docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+            ls -d * */*
       - run:
           name: build a docker container
           command: |
