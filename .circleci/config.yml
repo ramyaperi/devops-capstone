@@ -142,7 +142,6 @@ jobs:
             at: ~/project/frontend/dist
       - run: |
             docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
-            ls -d * */*
       - run:
           name: build a docker container
           command: |
@@ -161,13 +160,10 @@ jobs:
       - run:
           name: install frontend
           command: |
-            ssh -o StrictHostKeyChecking=no  ubuntu@ec2-3-127-223-111.eu-central-1.compute.amazonaws.com
-            sudo su
-            kubectl get pods -o wide
-            kubectl set image deployment/frontend-deployment frontend=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" --record
-            kubectl get pods -o wide
-            exit
-            exit
+            ssh -o StrictHostKeyChecking=no  ubuntu@ec2-3-127-223-111.eu-central-1.compute.amazonaws.com "sudo su;
+            kubectl get pods -o wide;
+            kubectl set image deployment/frontend-deployment frontend=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" --record;
+            kubectl get pods -o wide";
 workflows:
   default:
     jobs:
