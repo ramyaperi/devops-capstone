@@ -7,4 +7,4 @@ replicas and rolling deployment. I is only a staic angular page
  which are in the folder /aws
 - few steps in   Kubernetes cluster initialization were done 
 manually as this was first attemp at setting up and needed debugging (not a repetative task anyway)
-
+- Dockerfile is in frontend (onla frondend folder needs actual deployment)
