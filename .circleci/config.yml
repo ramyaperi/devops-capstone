@@ -123,6 +123,10 @@ jobs:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ./frontend/dist
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./frontend/dist
       - slack-notification-fail
   deploy-frontend:
     docker:
