@@ -70,11 +70,17 @@ jobs:
           key: v1-dependencies-{{ checksum "./frontend/package.json" }}
           paths:
             - ./frontend/node_modules
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./frontend/node_modules
   test-frontend:
     docker:
       - image: circleci/node:12.16-browsers
     steps:
       - checkout
+      - attach_workspace:
+            at: ~/project/frontend/node_modules
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "./frontend/package.json" }}
@@ -105,6 +111,8 @@ jobs:
       - image: circleci/node:12.16-browsers
     steps:
       - checkout
+      - attach_workspace:
+            at: ~/project/frontend/node_modules
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "./frontend/package.json" }}
@@ -154,7 +162,9 @@ jobs:
           name: install frontend
           command: |
             ssh -o StrictHostKeyChecking=no  ubuntu@ec2-3-127-223-111.eu-central-1.compute.amazonaws.com
+            kubectl get pods -o wide
             kubectl set image deployment/frontend-deployment frontend=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" --record
+            kubectl get pods -o wide
 workflows:
   default:
     jobs:
