@@ -127,7 +127,6 @@ jobs:
   deploy-frontend:
     docker:
       - image:  docker:17.05.0-ce-git
-    working_directory: ~/project/frontend
     steps:
       - checkout
       - setup_remote_docker
@@ -137,7 +136,7 @@ jobs:
       - run: |
             docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
             echo $CIRCLE_WORKING_DIRECTORY
-            cd frontend
+            cd /home/circleci/project/frontend
             ls -d * */*
       - run:
           name: build a docker container
