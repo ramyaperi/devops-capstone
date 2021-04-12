@@ -134,8 +134,6 @@ jobs:
             at: ~/project/frontend/dist
       - run: |
             docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
-            echo $CIRCLE_WORKING_DIRECTORY
-            cd /home/circleci/project/frontend
             ls -d * */*
       - run:
           name: build a docker container
