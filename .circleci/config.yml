@@ -119,16 +119,12 @@ jobs:
           command: |
             cd frontend
             npm run build
-      - save_cache:
-          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - ./frontend/dist
       - persist_to_workspace:
           root: ~/project
           paths:
             - ./frontend/dist
       - slack-notification-fail
-  deploy-frontend:
+  dockerize-frontend:
     docker:
       - image:  docker:17.05.0-ce-git
     steps:
@@ -136,9 +132,6 @@ jobs:
       - setup_remote_docker
       - attach_workspace:
             at: ~/project/frontend/dist
-      - restore_cache:
-          keys:
-             - v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
       - run: |
             docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
             echo $CIRCLE_WORKING_DIRECTORY
@@ -155,6 +148,15 @@ jobs:
             cd frontend
             docker push ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}"
       - slack-notification-fail
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+      steps:
+        - run:
+            name: install frontend
+            command: |
+              ssh -o StrictHostKeyChecking=no  ubuntu@ec2-3-127-223-111.eu-central-1.compute.amazonaws.com
+              kubectl set image deployment/frontend-deployment frontend=ramyaperi/dev:devops-"${CIRCLE_WORKFLOW_ID:0:7}" --record
 workflows:
   default:
     jobs:
@@ -168,7 +170,11 @@ workflows:
           requires:
             - setup-environment
             - test-frontend
-      - deploy-frontend:
+      - dockerize-frontend:
           context: slack
           requires:
             - build-frontend
+      - deploy-frontend:
+          context: slack
+          requires:
+            - dockerize-frontend
