@@ -148,7 +148,7 @@ jobs:
       - slack-notification-fail
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: circleci/node:12.16-browsers
     steps:
       - run:
           name: install frontend
